@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RAMQ Billing Assistant - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -11,6 +11,24 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Mobile optimizations */
+        input,
+        select,
+        button {
+            touch-action: manipulation;
+        }
+
+        /* Prevent zoom on iOS inputs */
+        @media screen and (max-width: 768px) {
+
+            input,
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
         }
 
         .glass-panel {
@@ -18,62 +36,58 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
     </style>
 </head>
 
-<body class="bg-slate-50 min-h-screen text-slate-800">
+<body class="bg-slate-50 min-h-screen text-slate-800 pb-20 md:pb-0">
 
     <!-- Navbar -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center gap-3">
-                    <div class="bg-blue-600 text-white p-2 rounded-lg">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg shadow-blue-200 shadow-lg">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
                             </path>
                         </svg>
                     </div>
-                    <span class="font-bold text-xl tracking-tight text-slate-900">RAMQ Billing <span
+                    <span class="font-bold text-lg md:text-xl tracking-tight text-slate-900">RAMQ <span
                             class="text-blue-600">Assistant</span></span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full flex items-center gap-2">
+                    <div
+                        class="text-xs md:text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full flex items-center gap-2">
                         <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        Système Actif
+                        <span class="hidden md:inline">Système Actif</span>
+                        <span class="md:hidden">Actif</span>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
 
-        <!-- Section Recherche Rapide (Nouveau) -->
-        <div class="mb-8">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <!-- Section Recherche Rapide -->
+        <div class="mb-6 md:mb-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6">
                 <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                    Recherche de Codes
+                    Recherche
                 </h2>
 
-                <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex flex-col md:flex-row gap-3 md:gap-4 mb-4">
                     <div class="flex-1 relative">
                         <input type="text" id="searchInput" list="searchSuggestions"
-                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none"
-                            placeholder="Rechercher un code, une description ou un symptôme..." autocomplete="off">
-                        <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3.5" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                            class="w-full pl-10 pr-4 py-3.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none text-base shadow-sm"
+                            placeholder="Code, description..." autocomplete="off">
+                        <svg class="w-5 h-5 text-slate-400 absolute left-3 top-4 md:top-3.5" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
@@ -89,62 +103,64 @@
                         </datalist>
                     </div>
 
-                    <select id="categoryFilter"
-                        class="md:w-64 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
-                        <option value="">Toutes catégories</option>
-                        <option value="urgence">Urgence</option>
-                        <option value="cabinet">Cabinet</option>
-                        <option value="procedure">Procédures</option>
-                        <option value="pediatrie">Pédiatrie</option>
-                        <option value="obstetrique">Obstétrique</option>
-                        <option value="gynecologie">Gynécologie</option>
-                        <option value="dermatologie">Dermatologie</option>
-                        <option value="domicile">Domicile</option>
-                        <option value="chsld">CHSLD</option>
-                    </select>
+                    <div class="flex gap-2">
+                        <select id="categoryFilter"
+                            class="flex-1 md:w-64 px-4 py-3.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer text-base">
+                            <option value="">Catégories</option>
+                            <option value="urgence">Urgence</option>
+                            <option value="cabinet">Cabinet</option>
+                            <option value="procedure">Procédures</option>
+                            <option value="pediatrie">Pédiatrie</option>
+                            <option value="obstetrique">Obstétrique</option>
+                            <option value="gynecologie">Gynécologie</option>
+                            <option value="dermatologie">Dermatologie</option>
+                            <option value="domicile">Domicile</option>
+                            <option value="chsld">CHSLD</option>
+                        </select>
 
-                    <button onclick="searchCodes()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-medium transition shadow-lg shadow-blue-600/20">
-                        Rechercher
-                    </button>
+                        <button onclick="searchCodes()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 md:py-3 rounded-xl font-medium transition shadow-lg shadow-blue-600/20 active:scale-95">
+                            Go
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Filtres Rapides (Tags) -->
-                <div class="flex flex-wrap gap-2">
+                <!-- Filtres Rapides (Tags) - Scrollable horizontalement sur mobile -->
+                <div class="flex overflow-x-auto pb-2 md:pb-0 gap-2 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
                     <button onclick="quickSearch('Consultation')"
-                        class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition border border-blue-100">Consultation</button>
+                        class="whitespace-nowrap flex-shrink-0 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium active:bg-blue-100 border border-blue-100">Consultation</button>
                     <button onclick="quickSearch('Examen')"
-                        class="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-100 transition border border-purple-100">Examen</button>
+                        class="whitespace-nowrap flex-shrink-0 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium active:bg-purple-100 border border-purple-100">Examen</button>
                     <button onclick="quickSearch('70+')"
-                        class="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition border border-green-100">Gériatrie
+                        class="whitespace-nowrap flex-shrink-0 px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium active:bg-green-100 border border-green-100">Gériatrie
                         (70+)</button>
                     <button onclick="quickSearch('Trauma')"
-                        class="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-medium hover:bg-red-100 transition border border-red-100">Trauma</button>
+                        class="whitespace-nowrap flex-shrink-0 px-4 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-medium active:bg-red-100 border border-red-100">Trauma</button>
                     <button onclick="quickSearch('Suture')"
-                        class="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg text-sm font-medium hover:bg-orange-100 transition border border-orange-100">Suture</button>
+                        class="whitespace-nowrap flex-shrink-0 px-4 py-2 bg-orange-50 text-orange-700 rounded-lg text-sm font-medium active:bg-orange-100 border border-orange-100">Suture</button>
                 </div>
 
-                <!-- Résultats de recherche (Initialement caché) -->
+                <!-- Résultats de recherche -->
                 <div id="searchResults" class="mt-6 hidden"></div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
 
             <!-- Colonne Gauche: Assistant IA -->
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6">
                     <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg">🤖</span>
-                        Assistant Facturation IA
+                        Assistant IA
                     </h2>
 
-                    <form id="encounterForm" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <form id="encounterForm" class="space-y-5 md:space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">Niveau de Triage</label>
                                 <select id="triage"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                    class="w-full px-4 py-3.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition text-base">
                                     <option value="1">P1 - Réanimation</option>
                                     <option value="2">P2 - Très urgent</option>
                                     <option value="3" selected>P3 - Urgent</option>
@@ -154,51 +170,63 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">Durée (min)</label>
-                                <input type="number" id="duration" value="30"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                <div class="flex items-center gap-4">
+                                    <input type="range" id="durationRange" min="5" max="120" step="5" value="30"
+                                        class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                                        oninput="document.getElementById('duration').value = this.value">
+                                    <input type="number" id="duration" value="30"
+                                        class="w-20 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center font-bold text-indigo-600"
+                                        oninput="document.getElementById('durationRange').value = this.value">
+                                </div>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">Plainte / Motif</label>
                             <input type="text" id="complaint"
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
-                                placeholder="Ex: Douleur thoracique, trauma mineur...">
+                                class="w-full px-4 py-3.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition text-base"
+                                placeholder="Ex: Douleur thoracique...">
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-3">Procédures</label>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <div class="grid grid-cols-2 gap-3">
                                 <label
-                                    class="flex items-center p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition">
+                                    class="flex items-center p-3 border border-slate-200 rounded-xl active:bg-slate-50 cursor-pointer transition touch-manipulation">
                                     <input type="checkbox" value="ECG"
-                                        class="procedure w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
-                                    <span class="ml-2 text-sm text-slate-600">ECG</span>
+                                        class="procedure w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-3 text-sm text-slate-700 font-medium">ECG</span>
                                 </label>
                                 <label
-                                    class="flex items-center p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition">
+                                    class="flex items-center p-3 border border-slate-200 rounded-xl active:bg-slate-50 cursor-pointer transition touch-manipulation">
                                     <input type="checkbox" value="Suture simple"
-                                        class="procedure w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
-                                    <span class="ml-2 text-sm text-slate-600">Suture simple</span>
+                                        class="procedure w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-3 text-sm text-slate-700 font-medium">Suture simple</span>
                                 </label>
                                 <label
-                                    class="flex items-center p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition">
+                                    class="flex items-center p-3 border border-slate-200 rounded-xl active:bg-slate-50 cursor-pointer transition touch-manipulation">
                                     <input type="checkbox" value="Radiographie"
-                                        class="procedure w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
-                                    <span class="ml-2 text-sm text-slate-600">Radiographie</span>
+                                        class="procedure w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-3 text-sm text-slate-700 font-medium">Radio</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-slate-200 rounded-xl active:bg-slate-50 cursor-pointer transition touch-manipulation">
+                                    <input type="checkbox" value="Plâtre"
+                                        class="procedure w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-3 text-sm text-slate-700 font-medium">Plâtre</span>
                                 </label>
                             </div>
                         </div>
 
                         <button type="submit"
-                            class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 transition transform hover:scale-[1.01]">
+                            class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 active:from-indigo-700 active:to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 transition transform active:scale-[0.98]">
                             ✨ Analyser le Cas
                         </button>
                     </form>
                 </div>
 
                 <!-- Résultats IA -->
-                <div id="results" class="hidden bg-white rounded-2xl shadow-lg border border-indigo-100 p-6">
+                <div id="results" class="hidden bg-white rounded-2xl shadow-lg border border-indigo-100 p-4 md:p-6">
                     <div id="resultsContent"></div>
                 </div>
             </div>
@@ -223,11 +251,10 @@
                 </div>
 
                 <!-- Historique Rapide -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-slate-800">Historique Récent</h3>
-                        <button onclick="clearHistory()"
-                            class="text-xs text-red-500 hover:text-red-600">Effacer</button>
+                        <h3 class="font-semibold text-slate-800">Historique</h3>
+                        <button onclick="clearHistory()" class="text-xs text-red-500 p-2 -mr-2">Effacer</button>
                     </div>
                     <div id="historyList" class="space-y-3">
                         <!-- Rempli par JS -->
@@ -270,28 +297,28 @@
                 if (codes.length === 0) {
                     resultsDiv.innerHTML = `
                         <div class="text-center py-8 bg-slate-50 rounded-xl border border-slate-200">
-                            <p class="text-slate-500">Aucun code trouvé pour "${query}" ${category ? 'dans ' + category : ''}</p>
-                            ${category ? '<button onclick="document.getElementById(\'categoryFilter\').value=\'\'; searchCodes()" class="mt-2 text-blue-600 hover:underline">Essayer dans toutes les catégories</button>' : ''}
+                            <p class="text-slate-500">Aucun code trouvé</p>
+                            ${category ? '<button onclick="document.getElementById(\'categoryFilter\').value=\'\'; searchCodes()" class="mt-2 text-blue-600 font-medium">Voir tout</button>' : ''}
                         </div>`;
                     return;
                 }
 
-                let html = `<div class="mb-3 text-sm text-slate-500">${codes.length} résultats trouvés</div><div class="grid gap-3 max-h-96 overflow-y-auto pr-2">`;
+                let html = `<div class="mb-3 text-sm text-slate-500">${codes.length} résultats</div><div class="grid gap-3 max-h-96 overflow-y-auto pr-1">`;
 
                 codes.forEach(code => {
                     html += `
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition group">
-                            <div class="flex justify-between items-start gap-4">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 active:border-blue-400 transition group">
+                            <div class="flex justify-between items-start gap-3">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1 flex-wrap">
                                         <span class="font-mono font-bold text-blue-700 text-lg">${code.code}</span>
-                                        <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full uppercase font-medium">${code.category}</span>
+                                        <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full uppercase font-medium truncate max-w-[150px]">${code.category}</span>
                                     </div>
-                                    <p class="text-slate-700 text-sm leading-relaxed">${code.description}</p>
+                                    <p class="text-slate-700 text-sm leading-relaxed line-clamp-2">${code.description}</p>
                                 </div>
-                                <div class="text-right flex-shrink-0">
+                                <div class="text-right flex-shrink-0 flex flex-col items-end">
                                     <div class="font-bold text-green-600 text-lg">${code.base_fee.toFixed(2)}$</div>
-                                    <button onclick="copyCode('${code.code}')" class="mt-2 text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition font-medium opacity-0 group-hover:opacity-100">
+                                    <button onclick="copyCode('${code.code}')" class="mt-2 text-xs bg-blue-50 text-blue-600 px-3 py-2 rounded-lg active:bg-blue-100 transition font-medium">
                                         Copier
                                     </button>
                                 </div>
@@ -304,7 +331,7 @@
 
             } catch (error) {
                 console.error(error);
-                resultsDiv.innerHTML = '<div class="text-red-500 text-center py-4">Erreur lors de la recherche</div>';
+                resultsDiv.innerHTML = '<div class="text-red-500 text-center py-4">Erreur connexion</div>';
             }
         }
 
@@ -320,7 +347,7 @@
             const contentDiv = document.getElementById('resultsContent');
 
             resultsDiv.classList.remove('hidden');
-            contentDiv.innerHTML = '<div class="text-center py-12"><div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div><p class="mt-4 text-slate-500">Analyse intelligente en cours...</p></div>';
+            contentDiv.innerHTML = '<div class="text-center py-8"><div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div><p class="mt-4 text-slate-500">Analyse...</p></div>';
 
             // Collect data
             const procedures = Array.from(document.querySelectorAll('.procedure:checked')).map(cb => cb.value);
@@ -337,16 +364,15 @@
                 const result = response.data;
 
                 contentDiv.innerHTML = `
-                    <div class="space-y-6">
+                    <div class="space-y-5">
                         <!-- Header Résultat -->
                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                             <div>
                                 <h3 class="text-lg font-bold text-slate-800">Recommandation</h3>
-                                <div class="text-sm text-slate-500">Confiance IA: <span class="font-medium text-green-600">${Math.round(result.confidence * 100)}%</span></div>
+                                <div class="text-sm text-slate-500">Confiance: <span class="font-medium text-green-600">${Math.round(result.confidence * 100)}%</span></div>
                             </div>
                             <div class="text-right">
                                 <div class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">${result.total_fee.toFixed(2)} $</div>
-                                <div class="text-xs text-slate-400">Total Estimé</div>
                             </div>
                         </div>
 
@@ -354,19 +380,19 @@
                         <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Code Principal</span>
-                                <span class="text-sm font-mono text-blue-700 bg-white px-2 py-1 rounded border border-blue-100">${result.primary_code}</span>
+                                <span class="text-lg font-mono font-bold text-blue-700 bg-white px-2 py-1 rounded border border-blue-100">${result.primary_code}</span>
                             </div>
-                            <div class="text-slate-700 text-sm">${result.details.reasoning || 'Code suggéré basé sur le triage et la durée.'}</div>
+                            <div class="text-slate-700 text-sm">${result.details.reasoning || 'Suggéré par l\'IA.'}</div>
                         </div>
 
-                        <!-- Détails (Procédures & Modificateurs) -->
+                        <!-- Détails -->
                         ${result.procedure_codes.length > 0 || result.modifiers.length > 0 ? `
-                        <div class="space-y-3">
+                        <div class="space-y-2">
                             ${result.procedure_codes.map(code => `
                                 <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
                                     <span class="text-sm text-slate-700 flex items-center gap-2">
                                         <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                                        Procédure: <span class="font-mono font-medium">${code}</span>
+                                        ${code}
                                     </span>
                                 </div>`).join('')}
                             
@@ -374,29 +400,28 @@
                                 <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border border-yellow-100">
                                     <span class="text-sm text-yellow-800 flex items-center gap-2">
                                         <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></span>
-                                        Modificateur: <span class="font-mono font-medium">${mod}</span>
+                                        Modif: ${mod}
                                     </span>
                                 </div>`).join('')}
                         </div>` : ''}
 
                         <!-- Actions -->
                         <div class="grid grid-cols-2 gap-3 pt-2">
-                            <button onclick="copyCode('${result.primary_code}')" class="py-2.5 px-4 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 font-medium transition text-sm">
-                                Copier Code
+                            <button onclick="copyCode('${result.primary_code}')" class="py-3 px-4 bg-white border border-slate-200 text-slate-700 rounded-xl active:bg-slate-50 font-medium transition text-sm">
+                                Copier
                             </button>
-                            <button onclick="saveEncounter(${JSON.stringify(result).replace(/"/g, '&quot;')})" class="py-2.5 px-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium transition text-sm shadow-lg shadow-indigo-200">
+                            <button onclick="saveEncounter(${JSON.stringify(result).replace(/"/g, '&quot;')})" class="py-3 px-4 bg-indigo-600 text-white rounded-xl active:bg-indigo-700 font-medium transition text-sm shadow-lg shadow-indigo-200">
                                 Sauvegarder
                             </button>
                         </div>
                     </div>
                 `;
 
-                // Scroll to results
                 resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
             } catch (error) {
                 console.error(error);
-                contentDiv.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded-xl text-center">Erreur d'analyse: ${error.message}</div>`;
+                contentDiv.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded-xl text-center">Erreur: ${error.message}</div>`;
             }
         });
 
@@ -404,7 +429,11 @@
 
         function copyCode(code) {
             navigator.clipboard.writeText(code);
-            // Petit feedback visuel pourrait être ajouté ici
+            // Feedback subtil
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = 'Copié !';
+            setTimeout(() => btn.innerText = originalText, 1500);
         }
 
         function saveEncounter(data) {
@@ -412,6 +441,10 @@
             encounters.push({ ...data, saved_at: new Date().toISOString() });
             localStorage.setItem('encounters', JSON.stringify(encounters));
             loadHistory();
+
+            const btn = event.currentTarget;
+            btn.innerText = 'Sauvegardé !';
+            setTimeout(() => btn.innerText = 'Sauvegarder', 1500);
         }
 
         function loadHistory() {
@@ -419,7 +452,6 @@
             const list = document.getElementById('historyList');
             document.getElementById('totalEncounters').textContent = encounters.length;
 
-            // Calcul moyenne
             const total = encounters.reduce((acc, curr) => acc + (curr.total_fee || 0), 0);
             document.getElementById('avgFee').textContent = encounters.length ? (total / encounters.length).toFixed(2) + '$' : '0$';
 
@@ -430,11 +462,11 @@
 
             list.innerHTML = encounters.slice(-5).reverse().map(enc => `
                 <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
-                    <div>
-                        <div class="font-mono font-bold text-slate-700 text-sm">${enc.primary_code}</div>
+                    <div class="min-w-0">
+                        <div class="font-mono font-bold text-slate-700 text-sm truncate">${enc.primary_code}</div>
                         <div class="text-xs text-slate-400">${new Date(enc.saved_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
-                    <div class="font-bold text-green-600 text-sm">${enc.total_fee.toFixed(2)}$</div>
+                    <div class="font-bold text-green-600 text-sm ml-2">${enc.total_fee.toFixed(2)}$</div>
                 </div>
             `).join('');
         }
