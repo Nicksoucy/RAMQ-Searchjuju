@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche & Historique - RAMQ Billing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">🔍 Recherche & Historique</h1>
+                    <p class="text-gray-600">Recherchez des codes RAMQ et consultez l'historique</p>
+                </div>
+                <a href="index.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">←
+                    Retour</a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Recherche de Codes -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">🔎 Recherche de Codes RAMQ</h2>
+
+                    <div class="space-y-4">
+                        <!-- Champ de recherche avec Autocomplete -->
+                        <div class="relative">
+                            <input type="text" id="searchInput" list="searchSuggestions"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Rechercher par code, description ou catégorie..." autocomplete="off">
+                            <datalist id="searchSuggestions">
+                                <option value="Trauma">
+                                <option value="Cœur">
+                                <option value="Urgence">
+                                <option value="Suture">
+                                <option value="Examen">
+                                <option value="Consultation">
+                                <option value="Visite">
+                                <option value="Majoration">
+                                <option value="Nuit">
+                                <option value="Pédiatrie">
+                            </datalist>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <select id="categoryFilter" class="px-4 py-2 border border-gray-300 rounded-lg">
+                                <option value="">Toutes catégories</option>
+                                <option value="urgence">Urgence</option>
+                                <option value="cabinet">Cabinet</option>
+                                <option value="procedure">Procédures</option>
+                                <option value="pediatrie">Pédiatrie</option>
+                                <option value="obstetrique">Obstétrique</option>
+                                <option value="gynecologie">Gynécologie</option>
+                                <option value="dermatologie">Dermatologie</option>
+                                <option value="domicile">Domicile</option>
+                                <option value="chsld">CHSLD</option>
+                            </select>
+
+                            <button onclick="searchCodes()"
+                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">🔍
+                                Rechercher</button>
+                        </div>
+                    </div>
+
+                    <div id="searchResults" class="mt-6"></div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">📋 Historique des Cas</h2>
+                        <button onclick="clearHistory()" class="text-red-600 hover:text-red-700 text-sm">🗑️ Effacer
+                            tout</button>
+                    </div>
+                    <div id="historyList" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">⚡ Templates Rapides</h3>
+                    <div class="space-y-3">
+                        <button onclick="useTemplate('urgence_simple')"
+                            class="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
+                            <div class="font-semibold text-blue-900">Urgence Simple</div>
+                            <div class="text-xs text-gray-600">P3, 30min, sans procédure</div>
+                        </button>
+                        <button onclick="useTemplate('suture')"
+                            class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition">
+                            <div class="font-semibold text-green-900">Suture</div>
+                            <div class="text-xs text-gray-600">P4, suture simple</div>
+                        </button>
+                        <button onclick="useTemplate('pediatrie')"
+                            class="w-full text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition">
+                            <div class="font-semibold text-purple-900">Pédiatrie</div>
+                            <div class="text-xs text-gray-600">Examen enfant</div>
+                        </button>
+                        <button onclick="useTemplate('domicile')"
+                            class="w-full text-left p-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition">
+                            <div class="font-semibold text-yellow-900">Visite Domicile</div>
+                            <div class="text-xs text-gray-600">Première visite</div>
+                        </button>
+                        <button onclick="useTemplate('nuit')"
+                            class="w-full text-left p-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition">
+                            <div class="font-semibold text-indigo-900">Urgence Nuit</div>
+                            <div class="text-xs text-gray-600">P2, 23h-7h, +30%</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
+                    <h3 class="text-lg font-semibold mb-3">📊 Statistiques</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>Codes disponibles:</span>
+                            <span class="font-bold" id="totalCodes">164</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Cas sauvegardés:</span>
+                            <span class="font-bold" id="savedCases">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Recherches:</span>
+                            <span class="font-bold" id="searchCount">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+        let searchCounter = 0;
+
+        async function searchCodes() {
+            const query = document.getElementById('searchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+
+            console.log('🔍 Recherche:', { query, category });
+
+            if (!query && !category) {
+                document.getElementById('searchResults').innerHTML = '<div class="text-center py-8 text-gray-500">Entrez un terme de recherche ou sélectionnez une catégorie</div>';
+                return;
+            }
+
+            document.getElementById('searchResults').innerHTML = '<div class="text-center py-8"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><p class="mt-2 text-gray-600">Recherche en cours...</p></div>';
+
+            try {
+                let url = API_URL + '/api/codes';
+                const params = [];
+                if (category) params.push('category=' + category);
+                if (query) params.push('search=' + encodeURIComponent(query));
+                if (params.length) url += '?' + params.join('&');
+
+                console.log('📡 URL:', url);
+
+                const response = await axios.get(url);
+                console.log('✅ Réponse:', response.data);
+
+                const codes = response.data.codes;
+
+                searchCounter++;
+                document.getElementById('searchCount').textContent = searchCounter;
+
+                if (codes.length === 0) {
+                    document.getElementById('searchResults').innerHTML = '<div class="text-center py-8 text-gray-500">Aucun code trouvé</div>';
+                    return;
+                }
+
+                console.log('📋 ' + codes.length + ' codes trouvés');
+
+                let html = '<div class="mb-3 text-sm text-gray-600">' + codes.length + ' code(s) trouvé(s)</div><div class="space-y-3 max-h-96 overflow-y-auto">';
+
+                codes.forEach(function (code) {
+                    html += '<div class="p-5 border-2 border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition bg-white">';
+                    html += '<div class="flex items-start justify-between gap-4">';
+                    html += '<div class="flex-1">';
+                    html += '<div class="flex items-center gap-3 mb-3">';
+                    html += '<span class="font-mono font-bold text-blue-700 text-2xl">' + code.code + '</span>';
+                    html += '<span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full uppercase">' + code.category + '</span>';
+                    html += '</div>';
+                    html += '<div class="text-gray-800 font-medium text-base mb-3 leading-relaxed">' + code.description + '</div>';
+                    html += '<div class="flex items-center gap-2">';
+                    html += '<span class="text-sm text-gray-600">Tarif de base:</span>';
+                    html += '<span class="text-xl font-bold text-green-600">' + code.base_fee.toFixed(2) + ' $</span>';
+                    html += '</div></div>';
+                    html += '<button onclick="copyCodeToClipboard(\'' + code.code + '\')" class="flex-shrink-0 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition shadow-sm">📋 Copier</button>';
+                    html += '</div></div>';
+                });
+
+                html += '</div>';
+                document.getElementById('searchResults').innerHTML = html;
+
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                let errorMsg = 'Erreur lors de la recherche';
+                if (error.response) {
+                    errorMsg += ': ' + error.response.status + ' - ' + (error.response.data?.detail || error.response.statusText);
+                } else if (error.request) {
+                    errorMsg += ': Le serveur ne répond pas. Vérifiez que le backend est démarré.';
+                } else {
+                    errorMsg += ': ' + error.message;
+                }
+                document.getElementById('searchResults').innerHTML = '<div class="bg-red-50 border-2 border-red-200 text-red-700 p-4 rounded-lg"><div class="font-bold mb-2">❌ ' + errorMsg + '</div><div class="text-sm">Ouvrez la console (F12) pour plus de détails.</div></div>';
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function () {
+            if (this.value.length >= 2) searchCodes();
+        });
+
+        function copyCodeToClipboard(code) {
+            navigator.clipboard.writeText(code);
+            alert('✅ Code copié: ' + code);
+        }
+
+        function loadHistory() {
+            const encounters = JSON.parse(localStorage.getItem('encounters') || '[]');
+            document.getElementById('savedCases').textContent = encounters.length;
+
+            if (encounters.length === 0) {
+                document.getElementById('historyList').innerHTML = '<div class="text-center py-8 text-gray-500">Aucun cas sauvegardé</div>';
+                return;
+            }
+
+            const recent = encounters.slice(-10).reverse();
+            let html = '';
+
+            recent.forEach(function (enc, index) {
+                const date = new Date(enc.saved_at);
+                html += '<div class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50">';
+                html += '<div class="flex items-start justify-between mb-2">';
+                html += '<div class="flex-1">';
+                html += '<div class="font-semibold text-gray-800">' + (enc.primary_code || 'N/A') + '</div>';
+                html += '<div class="text-sm text-gray-600">' + date.toLocaleDateString('fr-CA') + ' ' + date.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }) + '</div>';
+                html += '</div>';
+                html += '<div class="text-right"><div class="text-lg font-bold text-green-600">' + (enc.total_fee?.toFixed(2) || '0.00') + ' $</div></div>';
+                html += '</div>';
+                if (enc.details?.reasoning) html += '<div class="text-xs text-gray-500 mt-2">' + enc.details.reasoning + '</div>';
+                html += '<div class="flex gap-2 mt-3">';
+                html += '<button onclick="viewCase(' + (encounters.length - 1 - index) + ')" class="flex-1 text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200">👁️ Voir</button>';
+                html += '<button onclick="deleteCase(' + (encounters.length - 1 - index) + ')" class="flex-1 text-xs bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200">🗑️ Supprimer</button>';
+                html += '</div></div>';
+            });
+
+            document.getElementById('historyList').innerHTML = html;
+        }
+
+        function viewCase(index) {
+            const encounters = JSON.parse(localStorage.getItem('encounters') || '[]');
+            const enc = encounters[index];
+            if (!enc) return;
+            alert('Détails du cas:\n\nCode: ' + enc.primary_code + '\nTarif: ' + enc.total_fee + '$\nConfiance: ' + Math.round(enc.confidence * 100) + '%');
+        }
+
+        function deleteCase(index) {
+            if (!confirm('Supprimer ce cas?')) return;
+            const encounters = JSON.parse(localStorage.getItem('encounters') || '[]');
+            encounters.splice(index, 1);
+            localStorage.setItem('encounters', JSON.stringify(encounters));
+            loadHistory();
+        }
+
+        function clearHistory() {
+            if (!confirm('Effacer tout l\'historique?')) return;
+            localStorage.removeItem('encounters');
+            loadHistory();
+        }
+
+        function useTemplate(type) {
+            const templates = {
+                'urgence_simple': { triage: 3, complaint: 'Douleur abdominale', procedures: [], duration: 30 },
+                'suture': { triage: 4, complaint: 'Lacération mineure', procedures: ['Suture simple'], duration: 20 },
+                'pediatrie': { triage: 4, complaint: 'Examen pédiatrique de routine', procedures: [], duration: 25 },
+                'domicile': { triage: 3, complaint: 'Visite à domicile - Première visite', procedures: [], duration: 45 },
+                'nuit': { triage: 2, complaint: 'Urgence nocturne', procedures: [], duration: 40 }
+            };
+
+            const template = templates[type];
+            if (!template) return;
+
+            sessionStorage.setItem('template', JSON.stringify(template));
+            window.location.href = 'index.html';
+        }
+
+        loadHistory();
+
+        axios.get(API_URL + '/api/codes')
+            .then(function (response) {
+                document.getElementById('totalCodes').textContent = response.data.count;
+            })
+            .catch(function (error) {
+                console.error('Erreur chargement codes:', error);
+            });
+    </script>
+</body>
+
+</html>

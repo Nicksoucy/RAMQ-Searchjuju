@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMQ Billing Assistant - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                            </path>
+                        </svg>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">RAMQ Billing <span
+                            class="text-blue-600">Assistant</span></span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        Système Actif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Section Recherche Rapide (Nouveau) -->
+        <div class="mb-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Recherche de Codes
+                </h2>
+
+                <div class="flex flex-col md:flex-row gap-4 mb-4">
+                    <div class="flex-1 relative">
+                        <input type="text" id="searchInput" list="searchSuggestions"
+                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none"
+                            placeholder="Rechercher un code, une description ou un symptôme..." autocomplete="off">
+                        <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3.5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+
+                        <datalist id="searchSuggestions">
+                            <option value="Trauma">
+                            <option value="Cœur">
+                            <option value="Urgence">
+                            <option value="Suture">
+                            <option value="Examen">
+                            <option value="Consultation">
+                            <option value="Visite">
+                        </datalist>
+                    </div>
+
+                    <select id="categoryFilter"
+                        class="md:w-64 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                        <option value="">Toutes catégories</option>
+                        <option value="urgence">Urgence</option>
+                        <option value="cabinet">Cabinet</option>
+                        <option value="procedure">Procédures</option>
+                        <option value="pediatrie">Pédiatrie</option>
+                        <option value="obstetrique">Obstétrique</option>
+                        <option value="gynecologie">Gynécologie</option>
+                        <option value="dermatologie">Dermatologie</option>
+                        <option value="domicile">Domicile</option>
+                        <option value="chsld">CHSLD</option>
+                    </select>
+
+                    <button onclick="searchCodes()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-medium transition shadow-lg shadow-blue-600/20">
+                        Rechercher
+                    </button>
+                </div>
+
+                <!-- Filtres Rapides (Tags) -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="quickSearch('Consultation')"
+                        class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition border border-blue-100">Consultation</button>
+                    <button onclick="quickSearch('Examen')"
+                        class="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-100 transition border border-purple-100">Examen</button>
+                    <button onclick="quickSearch('70+')"
+                        class="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition border border-green-100">Gériatrie
+                        (70+)</button>
+                    <button onclick="quickSearch('Trauma')"
+                        class="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-medium hover:bg-red-100 transition border border-red-100">Trauma</button>
+                    <button onclick="quickSearch('Suture')"
+                        class="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg text-sm font-medium hover:bg-orange-100 transition border border-orange-100">Suture</button>
+                </div>
+
+                <!-- Résultats de recherche (Initialement caché) -->
+                <div id="searchResults" class="mt-6 hidden"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Colonne Gauche: Assistant IA -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg">🤖</span>
+                        Assistant Facturation IA
+                    </h2>
+
+                    <form id="encounterForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Niveau de Triage</label>
+                                <select id="triage"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                                    <option value="1">P1 - Réanimation</option>
+                                    <option value="2">P2 - Très urgent</option>
+                                    <option value="3" selected>P3 - Urgent</option>
+                                    <option value="4">P4 - Moins urgent</option>
+                                    <option value="5">P5 - Non urgent</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Durée (min)</label>
+                                <input type="number" id="duration" value="30"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Plainte / Motif</label>
+                            <input type="text" id="complaint"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                                placeholder="Ex: Douleur thoracique, trauma mineur...">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-3">Procédures</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <label
+                                    class="flex items-center p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="checkbox" value="ECG"
+                                        class="procedure w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-sm text-slate-600">ECG</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="checkbox" value="Suture simple"
+                                        class="procedure w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-sm text-slate-600">Suture simple</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="checkbox" value="Radiographie"
+                                        class="procedure w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                    <span class="ml-2 text-sm text-slate-600">Radiographie</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 transition transform hover:scale-[1.01]">
+                            ✨ Analyser le Cas
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Résultats IA -->
+                <div id="results" class="hidden bg-white rounded-2xl shadow-lg border border-indigo-100 p-6">
+                    <div id="resultsContent"></div>
+                </div>
+            </div>
+
+            <!-- Colonne Droite: Stats & Historique -->
+            <div class="space-y-6">
+                <!-- Stats Card -->
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📊</span> Performance
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                            <div class="text-2xl font-bold" id="totalEncounters">0</div>
+                            <div class="text-xs text-slate-300">Cas Analysés</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
+                            <div class="text-2xl font-bold text-green-400" id="avgFee">0$</div>
+                            <div class="text-xs text-slate-300">Moyenne</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historique Rapide -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-slate-800">Historique Récent</h3>
+                        <button onclick="clearHistory()"
+                            class="text-xs text-red-500 hover:text-red-600">Effacer</button>
+                    </div>
+                    <div id="historyList" class="space-y-3">
+                        <!-- Rempli par JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+
+        // --- Fonctions de Recherche ---
+
+        function quickSearch(term) {
+            document.getElementById('searchInput').value = term;
+            searchCodes();
+        }
+
+        async function searchCodes() {
+            const query = document.getElementById('searchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (!query && !category) return;
+
+            resultsDiv.classList.remove('hidden');
+            resultsDiv.innerHTML = '<div class="text-center py-8"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><p class="mt-2 text-slate-500">Recherche...</p></div>';
+
+            try {
+                let url = API_URL + '/api/codes';
+                const params = [];
+                if (category) params.push('category=' + category);
+                if (query) params.push('search=' + encodeURIComponent(query));
+                if (params.length) url += '?' + params.join('&');
+
+                const response = await axios.get(url);
+                const codes = response.data.codes;
+
+                if (codes.length === 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="text-center py-8 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="text-slate-500">Aucun code trouvé pour "${query}" ${category ? 'dans ' + category : ''}</p>
+                            ${category ? '<button onclick="document.getElementById(\'categoryFilter\').value=\'\'; searchCodes()" class="mt-2 text-blue-600 hover:underline">Essayer dans toutes les catégories</button>' : ''}
+                        </div>`;
+                    return;
+                }
+
+                let html = `<div class="mb-3 text-sm text-slate-500">${codes.length} résultats trouvés</div><div class="grid gap-3 max-h-96 overflow-y-auto pr-2">`;
+
+                codes.forEach(code => {
+                    html += `
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition group">
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-mono font-bold text-blue-700 text-lg">${code.code}</span>
+                                        <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full uppercase font-medium">${code.category}</span>
+                                    </div>
+                                    <p class="text-slate-700 text-sm leading-relaxed">${code.description}</p>
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                    <div class="font-bold text-green-600 text-lg">${code.base_fee.toFixed(2)}$</div>
+                                    <button onclick="copyCode('${code.code}')" class="mt-2 text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition font-medium opacity-0 group-hover:opacity-100">
+                                        Copier
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+
+                html += '</div>';
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                console.error(error);
+                resultsDiv.innerHTML = '<div class="text-red-500 text-center py-4">Erreur lors de la recherche</div>';
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') searchCodes();
+        });
+
+        // --- Fonctions Assistant IA ---
+
+        document.getElementById('encounterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const resultsDiv = document.getElementById('results');
+            const contentDiv = document.getElementById('resultsContent');
+
+            resultsDiv.classList.remove('hidden');
+            contentDiv.innerHTML = '<div class="text-center py-12"><div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div><p class="mt-4 text-slate-500">Analyse intelligente en cours...</p></div>';
+
+            // Collect data
+            const procedures = Array.from(document.querySelectorAll('.procedure:checked')).map(cb => cb.value);
+            const data = {
+                triage_level: parseInt(document.getElementById('triage').value),
+                chief_complaint: document.getElementById('complaint').value || "Non spécifié",
+                procedures: procedures,
+                duration_minutes: parseInt(document.getElementById('duration').value),
+                encounter_datetime: new Date().toISOString()
+            };
+
+            try {
+                const response = await axios.post(`${API_URL}/api/analyze`, data);
+                const result = response.data;
+
+                contentDiv.innerHTML = `
+                    <div class="space-y-6">
+                        <!-- Header Résultat -->
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Recommandation</h3>
+                                <div class="text-sm text-slate-500">Confiance IA: <span class="font-medium text-green-600">${Math.round(result.confidence * 100)}%</span></div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">${result.total_fee.toFixed(2)} $</div>
+                                <div class="text-xs text-slate-400">Total Estimé</div>
+                            </div>
+                        </div>
+
+                        <!-- Code Principal -->
+                        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Code Principal</span>
+                                <span class="text-sm font-mono text-blue-700 bg-white px-2 py-1 rounded border border-blue-100">${result.primary_code}</span>
+                            </div>
+                            <div class="text-slate-700 text-sm">${result.details.reasoning || 'Code suggéré basé sur le triage et la durée.'}</div>
+                        </div>
+
+                        <!-- Détails (Procédures & Modificateurs) -->
+                        ${result.procedure_codes.length > 0 || result.modifiers.length > 0 ? `
+                        <div class="space-y-3">
+                            ${result.procedure_codes.map(code => `
+                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                    <span class="text-sm text-slate-700 flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                        Procédure: <span class="font-mono font-medium">${code}</span>
+                                    </span>
+                                </div>`).join('')}
+                            
+                            ${result.modifiers.map(mod => `
+                                <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border border-yellow-100">
+                                    <span class="text-sm text-yellow-800 flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full"></span>
+                                        Modificateur: <span class="font-mono font-medium">${mod}</span>
+                                    </span>
+                                </div>`).join('')}
+                        </div>` : ''}
+
+                        <!-- Actions -->
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <button onclick="copyCode('${result.primary_code}')" class="py-2.5 px-4 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 font-medium transition text-sm">
+                                Copier Code
+                            </button>
+                            <button onclick="saveEncounter(${JSON.stringify(result).replace(/"/g, '&quot;')})" class="py-2.5 px-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium transition text-sm shadow-lg shadow-indigo-200">
+                                Sauvegarder
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Scroll to results
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            } catch (error) {
+                console.error(error);
+                contentDiv.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded-xl text-center">Erreur d'analyse: ${error.message}</div>`;
+            }
+        });
+
+        // --- Utils ---
+
+        function copyCode(code) {
+            navigator.clipboard.writeText(code);
+            // Petit feedback visuel pourrait être ajouté ici
+        }
+
+        function saveEncounter(data) {
+            const encounters = JSON.parse(localStorage.getItem('encounters') || '[]');
+            encounters.push({ ...data, saved_at: new Date().toISOString() });
+            localStorage.setItem('encounters', JSON.stringify(encounters));
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const encounters = JSON.parse(localStorage.getItem('encounters') || '[]');
+            const list = document.getElementById('historyList');
+            document.getElementById('totalEncounters').textContent = encounters.length;
+
+            // Calcul moyenne
+            const total = encounters.reduce((acc, curr) => acc + (curr.total_fee || 0), 0);
+            document.getElementById('avgFee').textContent = encounters.length ? (total / encounters.length).toFixed(2) + '$' : '0$';
+
+            if (!encounters.length) {
+                list.innerHTML = '<div class="text-center text-slate-400 text-sm py-4">Aucun historique</div>';
+                return;
+            }
+
+            list.innerHTML = encounters.slice(-5).reverse().map(enc => `
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                        <div class="font-mono font-bold text-slate-700 text-sm">${enc.primary_code}</div>
+                        <div class="text-xs text-slate-400">${new Date(enc.saved_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    </div>
+                    <div class="font-bold text-green-600 text-sm">${enc.total_fee.toFixed(2)}$</div>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            if (confirm('Tout effacer ?')) {
+                localStorage.removeItem('encounters');
+                loadHistory();
+            }
+        }
+
+        // Init
+        loadHistory();
+    </script>
+</body>
+
+</html>
